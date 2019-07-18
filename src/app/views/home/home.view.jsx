@@ -1,7 +1,6 @@
 import React from 'react'
 import * as Table from 'reactabular-table';
 import Metrics from './home.metrics'
-
 const Home = (props) =>
   <div className="row main">
     <div className="col">
@@ -17,7 +16,8 @@ const Home = (props) =>
           <Table.Provider
             className="table table-striped"
             columns={props.columns}>
-            <Table.Header className="" />
+            <Table.Header className="" 
+              headerRows={props.headerRows}/>
             <Table.Body rows={props.paginated.rows} rowKey="id" />
           </Table.Provider>
           {props.paginator}

@@ -5,6 +5,14 @@ $table-dark-color:#6B6B6B !default;
 $table-striped-order: even !default;
 $table-accent-bg: rgba(238, 238, 238, 0.5);
 .table {
+
+
+    
+    .sort-order{
+        display: none;
+    }
+    
+   
     thead {
         tr {
             background-color: #F6F6F6;
@@ -15,9 +23,34 @@ $table-accent-bg: rgba(238, 238, 238, 0.5);
             font-weight: 500;
             border-bottom: 1px solid #D8D8D8 !important;
             text-transform: capitalize;
+            cursor: pointer;
+    
+            span.sort{
+                font-family: "Font Awesome 5 Free";
+                display: inline-block;
+                padding-right: 3px;
+                vertical-align: middle;
+                font-weight: 900;
+            }
+            span.sort.sort-asc {
+                &:after {
+                    margin-left: 2px;
+                    content: "\f30c";
+                }
+            }
+              
+            span.sort.sort-desc {
+                &:after {
+                    margin-left: 2px;
+                    content: "\f309";
+                }
+            }
         }
     }
 }
+
+
+
 i.pending {
     background-color: #0177BD;
 }
