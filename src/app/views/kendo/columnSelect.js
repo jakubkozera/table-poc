@@ -6,22 +6,23 @@ import { Button, ButtonGroup, DropDownButton, DropDownButtonItem,
 const itemRender = (props) => {
 
         return (
-            <div>
+            <div className='column-select-item' style={{ padding: '3px', width: '100%' }}>
                 <input
+                style={{ padding: '3px', marginRight: '3px'  }}
                         className="k-checkbox"
                         defaultChecked={!props.item.hide}
                         id={'checkbox-' + props.item.field}
                         type="checkbox"
                         onChange={e =>  {
-                            console.log(e)
-                            console.log(props)
+
                             props.item.updateColumnsState(props.item.field, e.target.checked)}}
                     />
                 <label
                     htmlFor={'checkbox-' + props.item.field}
                     className="k-checkbox-label"
-                >
-                    {props.item.title}
+                    style={{ marginLeft: '3px', marginRight: '3px' }}
+                    >
+                    <span style={{ paddingLeft: '10px',  paddingRight: '10px'}}>{props.item.title}</span>
                 </label>
             </div>
         );
@@ -32,20 +33,19 @@ class ColumnsSelect extends React.Component {
 
 
     render() {
-        console.log("cselect: ")
-        console.log(this.props)
+
         const updateColumnsState = this.props.updateColumnsState;
         const columns = this.props.columns;
         const items = columns.map((c) => {
             return {...c,
                 updateColumnsState }
         });
-        console.log(items)
         return (
             <DropDownButton 
                 itemRender={itemRender}
                 items={items}
-                icon="columns" 
+                iconClass="fa fa-sliders"
+                title='Show/hide columns'
                 >
                 
              </DropDownButton >

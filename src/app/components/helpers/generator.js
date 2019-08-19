@@ -4,6 +4,7 @@ import schema2object from 'schema2object';
 import generators from 'annogenerate';
 
 const generate = schema2object.properties2object;
+const tasks = ['Conctact HR', 'Send Emails', 'Some other task', 'Yet another task'];
 const status = ['pending', 'approved', 'denied', 'smart'];
 const firstnames = [
     'Jack', 'Bo', 'John', 'Jill', 'Angus', 'Janet', 'Cecilia',
@@ -20,6 +21,10 @@ const second = ['le', 'kia', 'soft', 'cle', 'ice', 'ify', 'ture', 'tec', 'ware',
 const third = ['Ltd.', 'Inc.'];
 const countries = ['United States of America', 'France', 'Germany', 'Denmark', 'Australia', 'England', 'United Arab Emirates', 'Canada']
 
+function randomBool(){
+    return Math.random() < 0.2;
+}
+
 function randomDate(start, end) {
     return Math.round(new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())).getTime() / 1000)
   }
@@ -31,8 +36,14 @@ const generateRows = (amount, { definitions, properties }) =>
                 id() {
                     return uuid.v4();
                 },
+                isRed(){
+                    return randomBool();
+                },
                 status() {
                     return sample(status)
+                },
+                task(){
+                    return sample(tasks);
                 },
                 name() {
                     return `${sample(firstnames)} ${sample(lastnames)}`;
@@ -47,6 +58,9 @@ const generateRows = (amount, { definitions, properties }) =>
                 },
                 company() {
                     return `${sample(first)}${sample(second)} ${sample(third)}`;
+                },
+                assistant(){
+                    return `${sample(firstnames)} ${sample(lastnames)}`;
                 },
                 amount: generators.number.bind(null, 0, 100000),
                 submitted() { return  randomDate(new Date(2018, 0, 1), new Date())}, 

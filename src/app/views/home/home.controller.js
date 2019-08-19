@@ -54,8 +54,7 @@ class homeController extends React.Component {
 		const sortable = sort.sort({
 			getSortingColumns,
 			onSort: selectedColumn => {
-				console.log("sort, selectedColumn:")
-				console.log(selectedColumn)
+
 				this.setState({
 					sortingColumns: sort.byColumn({
 						sortingColumns: this.state.sortingColumns,

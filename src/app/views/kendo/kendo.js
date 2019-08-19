@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button } from '@progress/kendo-react-buttons';
-
+import Moment from 'react-moment';
 import { orderBy } from '@progress/kendo-data-query';
 import { Grid, GridToolbar, GridColumn as Column } from '@progress/kendo-react-grid';
 import { generateRows } from '../../components/helpers'
@@ -15,6 +15,12 @@ const schema = {
         id: {
             type: 'string'
         },
+        isRed: {
+            type: 'bool'
+        },
+        task: {
+            type: 'string'
+        },
         status: {
             type: 'string'
         },
@@ -22,6 +28,9 @@ const schema = {
             type: 'string'
         },
         name: {
+            type: 'string'
+        },
+        assistant: {
             type: 'string'
         },
         country: {
@@ -40,6 +49,7 @@ class CustomCell extends React.Component {
     render() {
 
         const status = this.props.dataItem.status;
+
         return (
             <td>
                 <i style={{ marginLeft: 'auto', marginRight: 'auto' }} className={status + ' icon-status'}></i>
@@ -50,36 +60,65 @@ class CustomCell extends React.Component {
 
 const statusCell = (props) => <CustomCell {...props} />;
 
-const columns = [{
+class DateTimeCell extends React.Component {
+    render() {
+        const timestamp = this.props.dataItem.submitted * 1000;
+        const dateTime = new Date(timestamp);
+
+        return (
+            <td>
+                <Moment format="MMM. DD, YYYY" date={dateTime} />
+            </td>
+        );
+
+    }
+}
+
+const dateTimeCell = (props) => <DateTimeCell {...props} />;
+
+const columns = [
+    {
         field: "id",
         hide: true,
         title: "Id"
-    }, {
+    },
+    {
         field: "status",
-        title: "Status",
+        title: "SLA",
         cell: statusCell,
         hide: false,
-        width: "90px"
+        width: "60px"
     },
     {
-        field:"amount",
+        field: "task",
+        title: "Tasks",
         hide: false,
-        title:"Amount" 
     },
     {
-        field:"name",
+        field: "amount",
         hide: false,
-        title:"Beneficiary"
+        title: "Amount"
     },
     {
-        field:"country",
+        field: "name",
         hide: false,
-        title:"Company"
+        title: "Beneficiary"
     },
     {
-        field:"submitted",
+        field: "country",
         hide: false,
-        title:"Submited"
+        title: "Company"
+    },
+    {
+        field: "assistant",
+        hide: false,
+        title: "Assistant"
+    },
+    {
+        field: "submitted",
+        hide: false,
+        title: "Date Due",
+        cell: dateTimeCell
     }
 ];
 
@@ -92,15 +131,21 @@ class KendoGrid extends React.Component {
 
         const columns = this.state.columns;
         const selectedColumn = columns.filter(c => c.field == column)[0];
-        const newValue = {...selectedColumn, hide: !checked};
-        console.log('newValue');
-        console.log(newValue);
+        const newValue = { ...selectedColumn, hide: !checked };
+
         const index = columns.indexOf(selectedColumn);
         columns.splice(index, 1, newValue);
         this.setState({
             columns: columns
         })
 
+    }
+    rowRender(trElement, props) {
+
+        const isRed = props.dataItem.isRed;
+        const red = { color: "red" };
+        const trProps = { style: isRed ? red : {} };
+        return React.cloneElement(trElement, { ...trProps }, trElement.props.children);
     }
 
     export = () => {
@@ -141,6 +186,20 @@ class KendoGrid extends React.Component {
                     <div className="row page-title">
                         <div className="col-12">
                             <h3 className="text-center">Kendo Grid Demo</h3>
+                                {/* <input
+                                    style={{ padding: '3px' }}
+                                    className="k-checkbox"
+                                    id={'checkbox-'}
+                                    type="checkbox"
+                                />
+                                <label
+                                    htmlFor={'checkbox-'}
+                                    className="k-checkbox-label"
+                                    style={{ marginLeft: '3px' }}
+                                >
+                                    <span style={{ paddingLeft: '10px',  paddingRight: '10px'}}>Test</span>
+                            </label> */}
+
                         </div>
                     </div>
                     <div className="row page-content">
@@ -150,10 +209,12 @@ class KendoGrid extends React.Component {
                                 ref={(exporter) => { this._export = exporter; }}
                             >
                                 <Grid
-                                    style={{ height: '600px' }}
+                                    rowRender={this.rowRender}
+                                    style={{ maxWidth: '100%', overflow: 'auto', border: '0px', borderTop: 'solid 1px #cfcfcf' }}
                                     data={orderBy(rows, this.state.sort).slice(this.state.skip, this.state.take + this.state.skip)}
                                     sortable
                                     resizable
+                                    scrollable={'none'}
                                     reorderable
                                     sort={this.state.sort}
                                     skip={this.state.skip}
@@ -168,25 +229,42 @@ class KendoGrid extends React.Component {
                                         });
                                     }}
                                 >
-                                    <GridToolbar>
-                                        <div style={{ float: 'right'}}>
+                                    <GridToolbar style={{ backgroundColor: 'white' }}>
+                                        <div style={{ float: 'right' }}>
                                             <Button
-                                                title="Export PDF"
-                                                icon={'file-excel'}
-                                                onClick={this.export}
+                                                title="Filter"
+                                                icon='sort-desc'
                                             >
                                             </Button>
-                                            <ColumnsSelect 
+                                            <Button
+                                                title="Refresh"
+                                                iconClass='fa fa-sync-alt'
+                                            >
+                                            </Button>
+                                            <ColumnsSelect
                                                 columns={this.state.columns}
+                                                icon='fa fa-sliders-h'
                                                 updateColumnsState={this.updateColumnsState.bind(this)}
                                             >
                                             </ColumnsSelect>
+                                            <Button
+                                                title="Export PDF"
+                                                iconClass='fa fa-download'
+                                                onClick={this.export}
+                                            >
+                                            </Button>
+
                                         </div>
 
                                     </GridToolbar>
                                     {this.state.columns.map((column, idx) =>
                                         !column.hide && (<Column key={idx} {...column} />)
                                     )}
+                                             <div class="k-loading-mask">
+              <span class="k-loading-text">Loading</span>
+              <div class="k-loading-image"></div>
+              <div class="k-loading-color"></div>
+          </div>
                                 </Grid>
                             </ExcelExport>
                         </div>
